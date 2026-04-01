@@ -9,11 +9,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app import create_app
+from init_db import init_database
 
 app = create_app()
 
-# Database is initialized by init_db.py during deployment.
-# Ensure db file exists and schema is created before running Gunicorn.
+# Ensure database is initialized in case init_db.py was not invoked in runtime container.
+try:
+    init_database()
+except Exception:
+    pass
 
 if __name__ == '__main__':
     app.run()

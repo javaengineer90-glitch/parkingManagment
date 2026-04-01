@@ -20,18 +20,27 @@ python app.py
 # Copy environment template
 cp .env.example .env
 
-# Edit .env with your settings
+# Edit .env with your settings (SECRET_KEY and DATABASE_URL)
 nano .env
 
 # Build and run
+docker-compose build --no-cache web
 docker-compose up -d
 
 # View logs
 docker-compose logs -f web
 
 # Stop
-docker-compose down
+docker-compose down -v
 ```
+
+### Production Mode (Docker with Postgres)
+- `docker-compose.yml` defines:
+  - `db` service using `postgres:15`
+  - `web` service, `DATABASE_URL=postgresql://parking_user:parking_pass@db:5432/parking_db`
+  - health checks and dependencies
+- `docker-entrypoint.sh` waits for Postgres readiness then runs `python init_db.py` and `gunicorn`.
+
 
 ### Production Mode (Traditional)
 ```bash

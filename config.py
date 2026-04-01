@@ -17,8 +17,8 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
-    # Database
-    DATABASE = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'parking.db'))
+    # Database (PostgreSQL)
+    DATABASE = os.environ.get('DATABASE_URL', 'postgresql://parking_user:parking_pass@db:5432/parking_db')
     
     # Flask-Mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')

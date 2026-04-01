@@ -23,11 +23,11 @@ RUN pip install --upgrade pip && \
 # Copy application code
 COPY --chown=appuser:appuser . .
 
-# Initialize database
-RUN python init_db.py
-
 # Pre-create and chown logs directory for non-root user
 RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+
+# Make entrypoint executable
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Switch to non-root user
 USER appuser
@@ -39,5 +39,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"
 
-# Run with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "wsgi:app"]
+# Run entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

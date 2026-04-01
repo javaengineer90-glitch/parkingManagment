@@ -1,15 +1,33 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: parking_db
+      POSTGRES_USER: parking_user
+      POSTGRES_PASSWORD: parking_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   web:
     build: .
     container_name: parking-management
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "5000:5000"
     environment:
       - FLASK_ENV=production
       - SECRET_KEY=${SECRET_KEY}
-      - DATABASE_URL=/app/data/parking.db
+      - DATABASE_URL=postgresql://parking_user:parking_pass@db:5432/parking_db
       - MAIL_SERVER=${MAIL_SERVER:-smtp.gmail.com}
       - MAIL_PORT=${MAIL_PORT:-587}
       - MAIL_USERNAME=${MAIL_USERNAME}
@@ -18,7 +36,6 @@ services:
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
     volumes:
-      - parking_db:/app/data
       - parking_logs:/app/logs
     restart: unless-stopped
     healthcheck:
@@ -29,7 +46,7 @@ services:
       start_period: 5s
 
 volumes:
-  parking_db:
+  pgdata:
     driver: local
   parking_logs:
     driver: local
