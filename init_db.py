@@ -25,8 +25,14 @@ def init_database():
         sqlite_path = _normalize_sqlite_path(database_url)
         abs_path = os.path.abspath(sqlite_path)
         db_dir = os.path.dirname(abs_path)
-        if db_dir and not os.path.exists(db_dir):
-            os.makedirs(db_dir, exist_ok=True)
+        try:
+            if db_dir and not os.path.exists(db_dir):
+                os.makedirs(db_dir, exist_ok=True)
+        except PermissionError:
+            abs_path = '/tmp/parking.db'
+            db_dir = os.path.dirname(abs_path)
+            if not os.path.exists(db_dir):
+                os.makedirs(db_dir, exist_ok=True)
 
         conn = sqlite3.connect(abs_path)
         conn.row_factory = sqlite3.Row

@@ -23,8 +23,8 @@ RUN pip install --upgrade pip && \
 # Copy application code
 COPY --chown=appuser:appuser . .
 
-# Pre-create and chown logs directory for non-root user
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+# Pre-create and chown data/logs directories for non-root user
+RUN mkdir -p /app/data /app/logs && chown -R appuser:appuser /app/data /app/logs
 
 # Make entrypoint executable
 RUN chmod +x /app/docker-entrypoint.sh
