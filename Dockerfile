@@ -26,6 +26,9 @@ COPY --chown=appuser:appuser . .
 # Initialize database
 RUN python init_db.py
 
+# Pre-create and chown logs directory for non-root user
+RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+
 # Switch to non-root user
 USER appuser
 

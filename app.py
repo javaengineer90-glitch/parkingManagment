@@ -16,16 +16,29 @@ login_manager.login_message_category = 'info'
 def setup_logging(app):
     """Configure application logging"""
     if not app.debug and not app.testing:
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        
-        file_handler = RotatingFileHandler('logs/parking_app.log', maxBytes=10240000, backupCount=10)
+        log_dir = os.path.join(app.root_path, 'logs')
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+        except PermissionError:
+            # Fallback to stdout logging when filesystem is not writable
+            fallback_handler = logging.StreamHandler()
+            fallback_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+            ))
+            fallback_handler.setLevel(logging.INFO)
+            app.logger.addHandler(fallback_handler)
+            app.logger.setLevel(logging.INFO)
+            app.logger.info('Parking Management App startup (stdout fallback, log dir unavailable)')
+            return
+
+        log_file = os.path.join(log_dir, 'parking_app.log')
+        file_handler = RotatingFileHandler(log_file, maxBytes=10240000, backupCount=10)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
         ))
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
-        
+
         app.logger.setLevel(logging.INFO)
         app.logger.info('Parking Management App startup')
 
