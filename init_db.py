@@ -1,6 +1,5 @@
 import os
 import sqlite3
-import psycopg2
 from werkzeug.security import generate_password_hash
 from config import get_config
 
@@ -48,22 +47,7 @@ def init_database():
         conn.close()
 
     else:
-        conn = psycopg2.connect(database_url)
-        cursor = conn.cursor()
-        with open(SCHEMA, 'r') as f:
-            cursor.execute(f.read())
-
-        cursor.execute("SELECT id FROM users WHERE email = %s", ('admin@society.com',))
-        if cursor.fetchone() is None:
-            cursor.execute(
-                "INSERT INTO users (name, email, password_hash, flat_number, phone, role) VALUES (%s, %s, %s, %s, %s, %s)",
-                ('Admin', 'admin@society.com', generate_password_hash('admin123', method='pbkdf2:sha256'), 'ADMIN', '0000000000', 'admin')
-            )
-            print("Default admin created: admin@society.com / admin123")
-
-        conn.commit()
-        cursor.close()
-        conn.close()
+        raise RuntimeError('Postgres mode not required for sqlite deployment')
 
     print("Database initialized successfully!")
 
