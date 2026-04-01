@@ -60,6 +60,14 @@ def create_app(config=None):
     # Setup logging
     setup_logging(app)
     
+    # Ensure DB schema exists in all start modes
+    from init_db import init_database
+    with app.app_context():
+        try:
+            init_database()
+        except Exception as e:
+            app.logger.warning(f"Database initialization attempt failed: {e}")
+
     # User loader
     from models.user import get_user_by_id
     

@@ -21,7 +21,10 @@ class SQLiteDB:
 
     def execute(self, query, params=None):
         cur = self.conn.cursor()
-        cur.execute(query, params or ())
+        try:
+            cur.execute(query, params or ())
+        except Exception as e:
+            raise RuntimeError(f"SQLite query failed: {e} | query={query} | params={params}") from e
         return cur
 
     def commit(self):
@@ -40,7 +43,10 @@ class PostgresDB:
 
     def execute(self, query, params=None):
         cur = self.cursor()
-        cur.execute(query, params or ())
+        try:
+            cur.execute(query, params or ())
+        except Exception as e:
+            raise RuntimeError(f"Postgres query failed: {e} | query={query} | params={params}") from e
         return cur
 
     def commit(self):

@@ -16,8 +16,9 @@ app = create_app()
 # Ensure database is initialized in case init_db.py was not invoked in runtime container.
 try:
     init_database()
-except Exception:
-    pass
+except Exception as e:
+    # Log but do not crash; app should keep running for diagnostics
+    print(f"Database initialization failed: {e}", flush=True)
 
 if __name__ == '__main__':
     app.run()
