@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}My Parking Spots{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-car-front"></i> My Parking Spots</h2>
+    <a href="{{ url_for('spots.add_spot') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Add Spot
+    </a>
+</div>
+
+{% if spots %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Spot Number</th>
+                <th>Location</th>
+                <th>Rate (Rs./hr)</th>
+                <th>Availability</th>
+                <th>Time Window</th>
+                <th>Guest Info</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for spot in spots %}
+            <tr>
+                <td><strong>{{ spot['spot_number'] }}</strong></td>
+                <td>{{ spot['location_description'] or '-' }}</td>
+                <td>Rs. {{ spot['hourly_rate'] }}</td>
+                <td>
+                    {% if spot['is_available'] %}
+                    <span class="badge bg-success">Available</span>
+                    {% else %}
+                    <span class="badge bg-danger">Unavailable</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if spot['available_from'] and spot['available_until'] %}
+                    {{ spot['available_from'] }} - {{ spot['available_until'] }}
+                    {% else %}
+                    All day
+                    {% endif %}
+                </td>
+                <td>
+                    {% if bookings_by_spot.get(spot['id']) %}
+                        {% for bk in bookings_by_spot[spot['id']] %}
+                        <div class="mb-1 small">
+                            <span class="badge bg-warning text-dark">Booked</span><br>
+                            <i class="bi bi-person-fill"></i> {{ bk['guest_name'] }} ({{ bk['guest_flat'] }})<br>
+                            <i class="bi bi-car-front"></i> {{ bk['vehicle_number'] }} ({{ bk['vehicle_type'] }})<br>
+                            <i class="bi bi-telephone"></i> {{ bk['guest_phone'] }}<br>
+                            <i class="bi bi-clock"></i> {{ bk['start_time'][:16].replace('T', ' ') }} - {{ bk['end_time'][:16].replace('T', ' ') }}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted small">No active bookings</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('spots.edit_spot', spot_id=spot['id']) }}" class="btn btn-outline-primary" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{{ url_for('spots.toggle_spot', spot_id=spot['id']) }}" class="btn btn-outline-warning" title="Toggle">
+                            <i class="bi bi-toggle-on"></i>
+                        </a>
+                        <a href="{{ url_for('spots.remove_spot', spot_id=spot['id']) }}" class="btn btn-outline-danger" title="Delete"
+                           onclick="return confirm('Delete this spot?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-car-front"></i>
+    <h4>No spots listed yet</h4>
+    <p>Add your parking spot to start earning from unused space.</p>
+    <a href="{{ url_for('spots.add_spot') }}" class="btn btn-primary">Add Your First Spot</a>
+</div>
+{% endif %}
+{% endblock %}

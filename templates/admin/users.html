@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-people"></i> Manage Users</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Flat</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.flat_number }}</td>
+                <td>{{ user.phone }}</td>
+                <td>
+                    {% if user.is_admin %}
+                    <span class="badge bg-warning">Admin</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Resident</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at[:10] }}</td>
+                <td>
+                    {% if not user.is_admin %}
+                    <a href="{{ url_for('admin.toggle_user', user_id=user.id) }}"
+                       class="btn btn-sm btn-outline-{{ 'danger' if user.is_active else 'success' }}">
+                        {{ 'Deactivate' if user.is_active else 'Activate' }}
+                    </a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

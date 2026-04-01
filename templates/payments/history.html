@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Payment History{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-wallet2"></i> Payment History</h2>
+
+{% if payments %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Spot</th>
+                <th>Vehicle</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Transaction ID</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td>{{ p['id'] }}</td>
+                <td>{{ p['spot_number'] }}</td>
+                <td>{{ p['vehicle_number'] }}</td>
+                <td>Rs. {{ p['amount'] }}</td>
+                <td>{{ p['payment_method'] }}</td>
+                <td><small>{{ p['transaction_id'] or '-' }}</small></td>
+                <td>
+                    {% if p['status'] == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% elif p['status'] == 'pending' %}
+                    <span class="badge bg-warning">Pending</span>
+                    {% elif p['status'] == 'refunded' %}
+                    <span class="badge bg-info">Refunded</span>
+                    {% else %}
+                    <span class="badge bg-danger">Failed</span>
+                    {% endif %}
+                </td>
+                <td>{{ p['created_at'][:16] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-wallet"></i>
+    <h4>No payments yet</h4>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-calendar-check"></i> My Booking History</h2>
+
+{% if bookings %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Spot</th>
+                <th>Owner</th>
+                <th>Vehicle</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Hours</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr class="booking-{{ b['status'] }}">
+                <td>{{ b['id'] }}</td>
+                <td>{{ b['spot_number'] }}</td>
+                <td>{{ b['owner_name'] }}</td>
+                <td>{{ b['vehicle_number'] }} ({{ b['vehicle_type'] }})</td>
+                <td>{{ b['start_time'][:16] }}</td>
+                <td>{{ (b['actual_end_time'] or b['end_time'])[:16] }}</td>
+                <td>{{ b['total_hours'] }}</td>
+                <td>Rs. {{ b['total_amount'] }}</td>
+                <td>
+                    {% if b['status'] == 'active' %}
+                    <span class="badge bg-primary">Active</span>
+                    {% elif b['status'] == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% else %}
+                    <span class="badge bg-danger">Cancelled</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if b['status'] == 'active' %}
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('bookings.end_booking_early', booking_id=b['id']) }}"
+                           class="btn btn-outline-warning" onclick="return confirm('End this booking now?')">
+                            <i class="bi bi-stop-circle"></i> End
+                        </a>
+                        <a href="{{ url_for('bookings.cancel_booking_route', booking_id=b['id']) }}"
+                           class="btn btn-outline-danger" onclick="return confirm('Cancel this booking?')">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    </div>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-calendar"></i>
+    <h4>No bookings yet</h4>
+    <p>Browse available spots and make your first booking.</p>
+    <a href="{{ url_for('spots.list_spots') }}" class="btn btn-primary">Browse Spots</a>
+</div>
+{% endif %}
+{% endblock %}

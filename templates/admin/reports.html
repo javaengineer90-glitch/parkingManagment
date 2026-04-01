@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Reports - Admin{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-graph-up"></i> Reports & Analytics</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card shadow stat-card">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Total Revenue</h6>
+                <div class="fs-4 fw-bold text-success">Rs. {{ "%.2f"|format(stats.total_revenue) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow stat-card">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Today</h6>
+                <div class="fs-4 fw-bold text-primary">Rs. {{ "%.2f"|format(stats.revenue_today) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow stat-card">
+            <div class="card-body text-center">
+                <h6 class="text-muted">This Month</h6>
+                <div class="fs-4 fw-bold text-info">Rs. {{ "%.2f"|format(stats.revenue_month) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow stat-card">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Total Bookings</h6>
+                <div class="fs-4 fw-bold">{{ stats.total_bookings }}</div>
+                <small class="text-muted">{{ stats.active_bookings }} active</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <h5><i class="bi bi-bar-chart"></i> Daily Revenue (Last 30 Days)</h5>
+        {% if daily_revenue %}
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Revenue</th>
+                        <th>Visual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set max_revenue = daily_revenue|map(attribute='total')|max %}
+                    {% for day in daily_revenue %}
+                    <tr>
+                        <td>{{ day['day'] }}</td>
+                        <td>Rs. {{ "%.2f"|format(day['total']) }}</td>
+                        <td style="width: 50%;">
+                            <div class="progress">
+                                <div class="progress-bar bg-success"
+                                     style="width: {{ (day['total'] / max_revenue * 100) if max_revenue else 0 }}%">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No revenue data for the last 30 days.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Book Parking Spot{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">
+                    <i class="bi bi-calendar-plus"></i> Book Spot {{ spot['spot_number'] }}
+                </h3>
+                <div class="alert alert-info">
+                    <strong>Rate:</strong> Rs. {{ spot['hourly_rate'] }}/hour
+                    {% if spot['available_from'] and spot['available_until'] %}
+                    | <strong>Available:</strong> {{ spot['available_from'] }} - {{ spot['available_until'] }}
+                    {% endif %}
+                </div>
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="vehicle_number" class="form-label">Vehicle Number</label>
+                            <input type="text" class="form-control" id="vehicle_number" name="vehicle_number"
+                                   placeholder="e.g. MH-12-AB-1234" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="vehicle_type" class="form-label">Vehicle Type</label>
+                            <select class="form-select" id="vehicle_type" name="vehicle_type">
+                                <option value="car">Car</option>
+                                <option value="bike">Bike</option>
+                                <option value="suv">SUV</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="start_time" class="form-label">Start Time</label>
+                            <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="end_time" class="form-label">End Time</label>
+                            <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light mb-3" id="estimate-card" style="display:none;">
+                        <div class="card-body">
+                            <h6>Estimated Cost</h6>
+                            <p class="mb-0">
+                                <span id="est-hours">-</span> hour(s) x Rs. {{ spot['hourly_rate'] }} =
+                                <strong>Rs. <span id="est-total">-</span></strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-check-circle"></i> Confirm Booking
+                        </button>
+                        <a href="{{ url_for('spots.list_spots') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const rate = {{ spot['hourly_rate'] }};
+const startInput = document.getElementById('start_time');
+const endInput = document.getElementById('end_time');
+const card = document.getElementById('estimate-card');
+const hoursSpan = document.getElementById('est-hours');
+const totalSpan = document.getElementById('est-total');
+
+function updateEstimate() {
+    const start = new Date(startInput.value);
+    const end = new Date(endInput.value);
+    if (start && end && end > start) {
+        const hours = Math.ceil((end - start) / 3600000);
+        hoursSpan.textContent = hours;
+        totalSpan.textContent = (hours * rate).toFixed(2);
+        card.style.display = 'block';
+    } else {
+        card.style.display = 'none';
+    }
+}
+startInput.addEventListener('change', updateEstimate);
+endInput.addEventListener('change', updateEstimate);
+</script>
+{% endblock %}

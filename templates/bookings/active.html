@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Active Bookings{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clock-fill text-primary"></i> Active Bookings</h2>
+
+{% if bookings %}
+<div class="row">
+    {% for b in bookings %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow booking-active">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Spot {{ b['spot_number'] }}</h5>
+                    <span class="badge bg-primary">Active</span>
+                </div>
+                <p class="mb-1"><i class="bi bi-car-front"></i> {{ b['vehicle_number'] }} ({{ b['vehicle_type'] }})</p>
+                <p class="mb-1"><i class="bi bi-person"></i> Owner: {{ b['owner_name'] }}</p>
+                <p class="mb-1"><i class="bi bi-clock"></i> {{ b['start_time'][:16] }} to {{ b['end_time'][:16] }}</p>
+                <p class="mb-2"><strong>Rs. {{ b['total_amount'] }}</strong> ({{ b['total_hours'] }} hrs)</p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('bookings.end_booking_early', booking_id=b['id']) }}"
+                       class="btn btn-warning btn-sm" onclick="return confirm('End this booking now? You will be charged pro-rated.')">
+                        <i class="bi bi-stop-circle"></i> End Early
+                    </a>
+                    <a href="{{ url_for('bookings.cancel_booking_route', booking_id=b['id']) }}"
+                       class="btn btn-outline-danger btn-sm" onclick="return confirm('Cancel this booking?')">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-check-circle"></i>
+    <h4>No active bookings</h4>
+    <p>You don't have any ongoing parking bookings.</p>
+</div>
+{% endif %}
+{% endblock %}

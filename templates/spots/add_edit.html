@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if spot else 'Add' }} Parking Spot{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">
+                    <i class="bi bi-{{ 'pencil' if spot else 'plus-circle' }}"></i>
+                    {{ 'Edit' if spot else 'Add' }} Parking Spot
+                </h3>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="spot_number" class="form-label">Spot Number / Identifier</label>
+                        <input type="text" class="form-control" id="spot_number" name="spot_number"
+                               value="{{ spot['spot_number'] if spot else '' }}" placeholder="e.g. P-101, Basement-A5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location_description" class="form-label">Location Description</label>
+                        <textarea class="form-control" id="location_description" name="location_description" rows="2"
+                                  placeholder="e.g. Basement Level 1, near elevator">{{ spot['location_description'] if spot else '' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hourly_rate" class="form-label">Hourly Rate (Rs.)</label>
+                        <input type="number" class="form-control" id="hourly_rate" name="hourly_rate"
+                               value="{{ spot['hourly_rate'] if spot else '' }}" min="1" step="0.5" placeholder="e.g. 50" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="available_from" class="form-label">Available From (optional)</label>
+                            <input type="time" class="form-control" id="available_from" name="available_from"
+                                   value="{{ spot['available_from'] if spot else '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="available_until" class="form-label">Available Until (optional)</label>
+                            <input type="time" class="form-control" id="available_until" name="available_until"
+                                   value="{{ spot['available_until'] if spot else '' }}">
+                        </div>
+                    </div>
+                    <small class="text-muted d-block mb-3">Leave time fields empty if available all day.</small>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            {{ 'Update' if spot else 'Add' }} Spot
+                        </button>
+                        <a href="{{ url_for('spots.my_spots') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

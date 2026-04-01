@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Complete Payment{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-body p-4 text-center">
+                <h3 class="mb-4"><i class="bi bi-credit-card"></i> Complete Payment</h3>
+                <p class="fs-5">Spot: <strong>{{ spot['spot_number'] }}</strong></p>
+                <p class="fs-3 fw-bold text-primary">Rs. {{ amount }}</p>
+                <button id="rzp-button" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-shield-lock"></i> Pay with Razorpay
+                </button>
+                <form id="payment-form" method="POST" action="{{ url_for('payments.verify_payment') }}" style="display:none;">
+                    <input type="hidden" name="payment_id" value="{{ payment_id }}">
+                    <input type="hidden" name="booking_id" value="{{ booking_id }}">
+                    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    key: "{{ key_id }}",
+    amount: {{ order['amount'] }},
+    currency: "INR",
+    name: "Society Parking",
+    description: "Parking Spot {{ spot['spot_number'] }}",
+    order_id: "{{ order['id'] }}",
+    handler: function(response) {
+        document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+        document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+        document.getElementById('razorpay_signature').value = response.razorpay_signature;
+        document.getElementById('payment-form').submit();
+    }
+};
+document.getElementById('rzp-button').onclick = function() {
+    var rzp = new Razorpay(options);
+    rzp.open();
+};
+</script>
+{% endblock %}
